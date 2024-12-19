@@ -325,7 +325,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
 
     @SimpleFunction(description = "Create a drag handle component.")
     fun CreateComponentForDrag(`in`: AndroidViewComponent, properties: Any) {
-        val handleComponent = dynamicComponents.createComponent(`in`, "Image", "DragHandleTag", properties)
+        val handleComponent = dynamicComponents.createComponent(`in`, name, "DragHandleTag", properties)
 
         // Установите дополнительные параметры для handleComponent, если необходимо
     }
