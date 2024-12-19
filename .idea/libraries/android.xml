@@ -1,0 +1,43 @@
+<component name="libraryTable">
+  <library name="android">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/android/loader-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/interpolator-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/viewpager-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/core-common-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/swiperefreshlayout-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/customview-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/print-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/cursoradapter-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/asynclayoutinflater-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/slidingpanelayout-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/core-runtime-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/legacy-support-core-ui-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/annotation-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/legacy-support-core-utils-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/lifecycle-runtime-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/versionedparcelable-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/documentfile-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/lifecycle-livedata-core-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/testing-support-R-classes.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/localbroadcastmanager-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/lifecycle-viewmodel-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/constraintlayout-1.1.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/coordinatorlayout-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/vectordrawable-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/android.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/drawerlayout-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/fragment-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/appcompat-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/collection-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/constraintlayout-solver-1.1.3.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/lifecycle-common-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/dx.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/vectordrawable-animated-1.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/lifecycle-livedata-2.0.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/android/core-1.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

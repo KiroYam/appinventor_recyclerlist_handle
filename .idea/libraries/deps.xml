@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="deps">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/deps/core-1.3.2.jar!/" />
+      <root url="jar://$PROJECT_DIR$/deps/recyclerview-1.1.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/deps/recyclerview-animators-4.0.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
