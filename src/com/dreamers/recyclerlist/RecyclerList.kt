@@ -42,7 +42,6 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     private var transparentView: Boolean = false
     private var enableSwipe: Boolean = false
     private var stringHandleId: String = ""
-    private var uniqueId: String = ""
     private var dragModeGlob: String = ""
 
     private fun createAdapter(): RecyclerView.Adapter<ViewHolder> {
@@ -65,7 +64,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         orientation: Int,
         reverse: Boolean,
         spanCount: Int,
-        dragMode: String,//dragByHandle
+        dragMode: String,
         swipe: Boolean,
         scrollBarColor: String,
         padRight: Int
@@ -79,9 +78,9 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
             )
             enableSwipe = swipe
             adapter = createAdapter()
-            // Создаем itemTouchHelper после инициализации адаптера
 
 
+            // Create itemTouchHelper after initializing the adapter
             if (dragMode.equals("handle") || dragMode.equals("longPress")) {
                 dragModeGlob = dragMode;
                 val touchHelper = initializeItemTouchHelper(this)
@@ -99,40 +98,40 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(recyclerView, dx, dy)
-                    // Получение данных о прокрутке
+                    // Getting scroll data
                     val totalScrollRange = recyclerView.computeVerticalScrollRange()
                     val verticalOffset = recyclerView.computeVerticalScrollOffset()
                     val visibleHeight = recyclerView.computeVerticalScrollExtent()
 
-                    // Рассчитываем высоту и позицию скроллбара (бегунка)
+                    // Calculate the height and position of the scrollbar (runner)
                     val scrollBarHeight = (visibleHeight.toFloat() / totalScrollRange * visibleHeight).toInt()
                     val scrollPercentage = verticalOffset.toFloat() / (totalScrollRange - visibleHeight)
 
-                    // Обновляем параметры кастомного скроллбара
+                    // Updating custom scrollbar parameters
                     customScrollBar?.layoutParams?.height = scrollBarHeight
                     customScrollBar?.translationY = scrollPercentage * (visibleHeight - scrollBarHeight)
 
-                    // Обновляем скроллбар
+                    // Updating the scrollbar
                     customScrollBar?.requestLayout()
                     OnScrolled(dx, dy)
                 }
             })
 
-            // Добавляем глобальный слушатель для установки размеров скроллбара при инициализации
+            // Add a global listener to set the scrollbar size on initialization
             viewTreeObserver.addOnGlobalLayoutListener {
                 val totalScrollRange = computeVerticalScrollRange()
                 val visibleHeight = computeVerticalScrollExtent()
 
-                // Рассчитываем высоту скроллбара
+                // Calculating the height of the scrollbar
                 val scrollBarHeight = (visibleHeight.toFloat() / totalScrollRange * visibleHeight).toInt()
 
-                // Устанавливаем размер скроллбара
+                // Set the scrollbar size
                 customScrollBar?.layoutParams?.height = scrollBarHeight
                 customScrollBar?.requestLayout()
             }
         }
 
-        // Создаем GradientDrawable с закругленными углами
+        // Create a GradientDrawable with Rounded Corners
         val roundedBackground = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             val color: Int = Color.parseColor(scrollBarColor)
@@ -140,28 +139,26 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
             cornerRadius = 10.px.toFloat() // Радиус закругления углов
         }
 
-        // Создание кастомного скроллбара
+        // Creating a custom scrollbar
         customScrollBar = View(context).apply {
             layoutParams = FrameLayout.LayoutParams(4.px, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
-                // Устанавливаем выравнивание по правой стороне
-                //(this as FrameLayout.LayoutParams).gravity = Gravity.END
+                // Set alignment to the right side
                 gravity = Gravity.END
-                marginStart = 0 // Нулевой отступ слева
-                marginEnd = 0 // Отступ справа
+                marginStart = 0 // Zero left margin
+                marginEnd = 0 // Zero right margin
             }
-            //setBackgroundColor(Color.GRAY) // Цвет скроллбара
-            background = roundedBackground // Устанавливаем закругленный фон
-            alpha = 0.5f // 70% непрозрачности
+            background = roundedBackground // Setting a rounded background
+            alpha = 0.5f // 50% opacity
         }
-        // Добавляем в контейнер
+        // Add to container
         (`in`.view as ViewGroup).apply {
             val frameLayout = FrameLayout(context).apply {
                 layoutParams = ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                // Устанавливаем отступы у самого контейнера
-                setPadding(0, 0, padRight.px, 0) // Отступ в 5 пикселей справа
+                // We set the margins for the container itself
+                setPadding(0, 0, padRight.px, 0) // Padding in padRight.px pixels on the right
             }
 
             frameLayout.addView(recyclerView, FrameLayout.LayoutParams(
@@ -171,7 +168,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
 
             frameLayout.addView(customScrollBar, FrameLayout.LayoutParams(
                 4.px,
-                ViewGroup.LayoutParams.WRAP_CONTENT // Высота скроллбара будет изменяться динамически
+                ViewGroup.LayoutParams.WRAP_CONTENT // The scrollbar height will change dynamically
             ).apply {
                 gravity = Gravity.END
             })
@@ -180,7 +177,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         }
     }
 
-    // Адаптер как внутренний класс
+    // Adapter as an inner class
     inner class RecyclerAdapter : RecyclerView.Adapter<ViewHolder>() {
         var itemTouchHelper: ItemTouchHelper? = null
         private var data: YailList = YailList.makeEmptyList()
@@ -194,22 +191,39 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
 
         fun moveMyItem(fromPosition: Int, toPosition: Int) {
             if (fromPosition < 0 || toPosition < 0 || fromPosition >= data.size || toPosition >= data.size) {
-                return // Проверка на допустимые индексы
+                return // Check for valid indices
             }
 
 
-            // Преобразуем YailList в изменяемый список
+            // Convert YailList to a mutable list
             val mutableData = data.toMutableList()
 
-            // Перемещаем элемент
-            val item = mutableData.removeAt(fromPosition) // Удаляем объект с позиции
-            mutableData.add(toPosition, item)           // Вставляем объект в новую позицию
+            // Move the element
+            val item = mutableData.removeAt(fromPosition) // Remove the object from the position
+            mutableData.add(toPosition, item)           // Insert the object into a new position
 
-            // Преобразуем обратно в YailList
+            // Convert back to YailList
             data = YailList.makeList(mutableData)
-            // Уведомляем адаптер об изменении позиций
+            // Notify the adapter about the change of positions
             notifyItemMoved(fromPosition, toPosition)
 
+        }
+
+        fun removeMyItem(fromPosition: Int) {
+            if (fromPosition < 0 || fromPosition >= data.size ) {
+                return // Check for valid indices
+            }
+
+            // Convert YailList to a mutable list
+            val mutableData = data.toMutableList()
+
+            // Move the element
+            val item = mutableData.removeAt(fromPosition) // Remove the object from the position
+
+            // Convert back to YailList
+            data = YailList.makeList(mutableData)
+            // Notify the adapter about the change of positions
+            notifyItemRemoved(fromPosition)
         }
 
 
@@ -228,7 +242,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
                     val dragHandleId = stringHandleId
                     val dragHandle = dynamicComponents.getAndroidViewById(dragHandleId)
 
-                    // Удаляем старый listener перед установкой нового
+                    // Remove the old listener before installing the new one
                     dragHandle?.view?.setOnTouchListener(null)
 
                     if (dragHandle?.view != null) {
@@ -245,10 +259,10 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         override fun getItemCount(): Int = data.size
     }
 
-    //@SimpleFunction(description = "Enable drag and drop functionality.")
+    //Enable drag and drop functionality
     private fun initializeItemTouchHelper(recyclerView: RecyclerView) : ItemTouchHelper{
-            val adapter = recyclerView.adapter as RecyclerAdapter//recyclerView.adapter as? RecyclerView.Adapter<RecyclerView.ViewHolder>
-            //val callback = DragAndDropCallback(this, adapter /*as RecyclerView.Adapter<RecyclerView.ViewHolder>*/, transparentView, enableSwipe, true)
+            val adapter = recyclerView.adapter as RecyclerAdapter
+
             val callback = when (dragModeGlob) {
                 "handle" -> DragAndDropCallback(this, adapter, transparentView, enableSwipe, true)
                 "longPress" -> DragAndDropCallback(this, adapter, transparentView, enableSwipe, false)
@@ -349,18 +363,14 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         description = "Set unique id of a view"
     )
     fun SetUniqueId(view: AndroidViewComponent, id: String) {
-        if (id.equals("DragHandleTag"))
-        {
-            uniqueId = System.currentTimeMillis().toString()
-            dynamicComponents.setUniqueId(view, uniqueId)
-            stringHandleId = uniqueId
+        if ("DragHandleTag" in id){
+            stringHandleId = id
         }
-        else
             dynamicComponents.setUniqueId(view, id)
     }
 
     @SimpleFunction(
-        description = "Get component with unique id."
+        description = "Get unique id associated with the given view."
     )
     fun GetUniqueId(view: AndroidViewComponent): String = dynamicComponents.getUniqueId(view)
 
@@ -374,7 +384,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     }
 
     @SimpleFunction(
-        description = "Get component using id. Make sure to set RootParent before using."
+        description = "Get component using id."
     )
     fun GetComponentByID(id: String): AndroidViewComponent? {
         return dynamicComponents.getAndroidViewById(id)
@@ -416,19 +426,19 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         recyclerView?.smoothScrollToPosition(position.dec())
     }
 
-    @SimpleEvent(description = "Triggered when onMove is called during drag and drop.")
+    @SimpleEvent(description = "riggered when an item in the list is moved.")
     fun OnMoveTriggered(fromPosition: Int, toPosition: Int) {
         EventDispatcher.dispatchEvent(this, "OnMoveTriggered", fromPosition, toPosition)
     }
 
-    @SimpleEvent(description = "Triggered when two adjacent items are swapped.")
+    @SimpleEvent(description = "TTriggered when the user starts moving an item.")
     fun OnMoveStart(position: Int) {
         EventDispatcher.dispatchEvent(this, "OnMoveStart", position)
     }
 
-    @SimpleEvent(description = "Triggered when two adjacent items are swapped.")
-    fun OnMoveEnd(startPos: Int, endPos: Int, string: String ) {
-        EventDispatcher.dispatchEvent(this, "OnMoveEnd", startPos, endPos, string)
+    @SimpleEvent(description = " Triggered when the user finishes moving an item.")
+    fun OnMoveEnd(startPos: Int, endPos: Int) {
+        EventDispatcher.dispatchEvent(this, "OnMoveEnd", startPos, endPos)
     }
 
     @SimpleEvent(

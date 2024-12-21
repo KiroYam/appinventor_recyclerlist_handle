@@ -22,7 +22,7 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
         var swipeFlags = 0
         if (enableSwipe)
-            swipeFlags = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT // Можно использовать для свайпов, если нужно
+            swipeFlags = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT // Can be used for swipes if needed
         return makeMovementFlags(dragFlags, swipeFlags)
     }
 
@@ -34,11 +34,8 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
         val fromPosition = viewHolder.adapterPosition
         val toPosition = target.adapterPosition
         currentViewHolder = viewHolder
-        //adapter.notifyItemMoved(fromPosition, toPosition)
         adapter.moveMyItem(fromPosition, toPosition)
-        //EventDispatcher.dispatchEvent(recyclerList, "OnMoveTriggered", fromPosition, toPosition)
-        // Обмен позиций элементов в адаптере
-        //adapter.notifyItemMoved(fromPosition, toPosition)
+        EventDispatcher.dispatchEvent(recyclerList, "OnMoveTriggered", fromPosition, toPosition)
 
         return true
     }
@@ -47,10 +44,9 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
         super.onSelectedChanged(viewHolder, actionState)
 
             if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-                // Элемент выбран для перетаскивания
-
+                // Element selected for dragging
                 if (transparentView == true) {
-                    viewHolder?.itemView?.alpha = 0.5f // Например, изменить прозрачность элемента
+                    viewHolder?.itemView?.alpha = 0.5f // Change the transparency of an element
                 }
                 currentViewHolder = viewHolder
                 startPosition = viewHolder?.adapterPosition
@@ -61,12 +57,12 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
                 startPosition = viewHolder?.adapterPosition
             }
             else if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
-                // Элемент больше не перетаскивается или не свайпается
+                // The element is no longer draggable or swiped
                 if (transparentView == true) {
-                    currentViewHolder?.itemView?.alpha = 1.0f // Восстановить исходную прозрачность элемента
+                    currentViewHolder?.itemView?.alpha = 1.0f // Restore the element's original transparency
                 }
-                EventDispatcher.dispatchEvent(recyclerList, "OnMoveEnd", startPosition, currentViewHolder?.adapterPosition, currentViewHolder)
-                //currentViewHolder = null
+                EventDispatcher.dispatchEvent(recyclerList, "OnMoveEnd", startPosition, currentViewHolder?.adapterPosition)
+                currentViewHolder = null
                 startPosition = 0
             }
     }
@@ -86,7 +82,7 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
                 )
             }
         }
-        adapter.notifyItemRemoved(position)
+        adapter.removeMyItem(position)
     }
 
     override fun isLongPressDragEnabled(): Boolean {
