@@ -8,7 +8,8 @@ import com.google.appinventor.components.runtime.EventDispatcher
 class DragAndDropCallback(private val recyclerList: RecyclerList,
                           private val adapter: RecyclerList.RecyclerAdapter,
                           private val transparentView: Boolean,
-                          private val enableSwipe: Boolean
+                          private val enableSwipe: Boolean,
+                          private val useHandle: Boolean
                           ) : ItemTouchHelper.Callback() {
 
     private var currentViewHolder: RecyclerView.ViewHolder? = null
@@ -89,7 +90,7 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
     }
 
     override fun isLongPressDragEnabled(): Boolean {
-        return false
+        return !useHandle
     }
 
     override fun isItemViewSwipeEnabled(): Boolean {

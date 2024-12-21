@@ -43,7 +43,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     private var enableSwipe: Boolean = false
     private var stringHandleId: String = ""
     private var uniqueId: String = ""
-    private var mylog: String = ""
+    private var dragModeGlob: String = ""
 
     private fun createAdapter(): RecyclerView.Adapter<ViewHolder> {
         return RecyclerAdapter()
@@ -65,7 +65,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         orientation: Int,
         reverse: Boolean,
         spanCount: Int,
-        dragByHandle: Boolean,
+        dragMode: String,//dragByHandle
         swipe: Boolean,
         scrollBarColor: String,
         padRight: Int
@@ -82,7 +82,8 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
             // Создаем itemTouchHelper после инициализации адаптера
 
 
-            if (dragByHandle) {
+            if (dragMode.equals("handle") || dragMode.equals("longPress")) {
+                dragModeGlob = dragMode;
                 val touchHelper = initializeItemTouchHelper(this)
                 (adapter as RecyclerAdapter).itemTouchHelper = touchHelper
             }
@@ -223,21 +224,22 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         override fun onBindViewHolder(viewHolder: ViewHolder, position: Int) {
             OnBindView(viewHolder.component, position.inc(), data[position.inc()])
 
-            val dragHandleId = stringHandleId//"DragHandleTag${position.inc()}"
-            val dragHandle = dynamicComponents.getAndroidViewById(dragHandleId)
+            if (dragModeGlob.equals("handle")){
+                    val dragHandleId = stringHandleId
+                    val dragHandle = dynamicComponents.getAndroidViewById(dragHandleId)
 
-            // Удаляем старый listener перед установкой нового
-            dragHandle?.view?.setOnTouchListener(null)
+                    // Удаляем старый listener перед установкой нового
+                    dragHandle?.view?.setOnTouchListener(null)
 
-            if (dragHandle?.view != null) {
-                    dragHandle.view.setOnTouchListener { _, event ->
-                        if (event.action == 0) {
-                            itemTouchHelper?.startDrag(viewHolder)
+                    if (dragHandle?.view != null) {
+                        dragHandle.view.setOnTouchListener { _, event ->
+                            if (event.action == 0) {
+                                itemTouchHelper?.startDrag(viewHolder)
+                            }
+                            return@setOnTouchListener true
                         }
-                        return@setOnTouchListener true
                     }
                 }
-
         }
 
         override fun getItemCount(): Int = data.size
@@ -246,9 +248,15 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     //@SimpleFunction(description = "Enable drag and drop functionality.")
     private fun initializeItemTouchHelper(recyclerView: RecyclerView) : ItemTouchHelper{
             val adapter = recyclerView.adapter as RecyclerAdapter//recyclerView.adapter as? RecyclerView.Adapter<RecyclerView.ViewHolder>
-            val callback = DragAndDropCallback(this, adapter /*as RecyclerView.Adapter<RecyclerView.ViewHolder>*/, transparentView, enableSwipe)
-            val itemTouchHelper = ItemTouchHelper(callback)
-            itemTouchHelper.attachToRecyclerView(recyclerView)
+            //val callback = DragAndDropCallback(this, adapter /*as RecyclerView.Adapter<RecyclerView.ViewHolder>*/, transparentView, enableSwipe, true)
+            val callback = when (dragModeGlob) {
+                "handle" -> DragAndDropCallback(this, adapter, transparentView, enableSwipe, true)
+                "longPress" -> DragAndDropCallback(this, adapter, transparentView, enableSwipe, false)
+                else ->  throw IllegalArgumentException("Invalid drag mode: $dragModeGlob")
+            }
+
+        val itemTouchHelper = ItemTouchHelper(callback)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
 
         return itemTouchHelper
     }
@@ -323,13 +331,6 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         dynamicComponents.createComponent(`in`, name, tag, properties)
     }
 
-    @SimpleFunction(description = "Create a drag handle component.")
-    fun CreateComponentForDrag(`in`: AndroidViewComponent, properties: Any) {
-        val handleComponent = dynamicComponents.createComponent(`in`, name, "DragHandleTag", properties)
-
-        // Установите дополнительные параметры для handleComponent, если необходимо
-    }
-
     @SimpleFunction(
         description = "Create components using JSON template."
     )
@@ -370,6 +371,13 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     fun GetComponent(root: AndroidViewComponent, tag: String): AndroidViewComponent? {
         val view = root.findViewByTag(tag)
         return dynamicComponents.getAndroidView(view)
+    }
+
+    @SimpleFunction(
+        description = "Get component using id. Make sure to set RootParent before using."
+    )
+    fun GetComponentByID(id: String): AndroidViewComponent? {
+        return dynamicComponents.getAndroidViewById(id)
     }
 
 
@@ -489,11 +497,6 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     )
     fun Data(): YailList {
         return (recyclerView?.adapter as? RecyclerAdapter)?.getData() ?: YailList.makeEmptyList()
-    }
-
-    @SimpleProperty()
-    fun MyLog(): String {
-        return mylog
     }
 
     @SimpleProperty(
@@ -678,4 +681,17 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
 
     @SimpleProperty
     fun ScrollStateSettling() = RecyclerView.SCROLL_STATE_SETTLING
+
+    @SimpleProperty
+    fun HandlerDragDropMode() = "handle"
+
+    @SimpleProperty
+    fun LongPressDragDropMode() = "longPress"
+
+    @SimpleProperty
+    fun NoDragDropMode() = "none"
+
+    @SimpleProperty
+    fun DragHandleTag() = "DragHandleTag"
+
 }
