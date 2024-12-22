@@ -135,8 +135,8 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         val roundedBackground = GradientDrawable().apply {
             shape = GradientDrawable.RECTANGLE
             val color: Int = Color.parseColor(scrollBarColor)
-            setColor(color) // Цвет скроллбара
-            cornerRadius = 10.px.toFloat() // Радиус закругления углов
+            setColor(color) // Scrollbar color
+            cornerRadius = 10.px.toFloat() // Corner rounding radius
         }
 
         // Creating a custom scrollbar
@@ -390,8 +390,6 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         return dynamicComponents.getAndroidViewById(id)
     }
 
-
-
     @SimpleFunction(
         description = "Get root view using component."
     )
@@ -489,7 +487,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     }
 
     @SimpleProperty(
-        description = "Update recycler view data. This causes recycler view to recreate views."
+        description = "Change transparancy of item while dragging"
     )
     fun TransparentView(value: Boolean) {
         transparentView = value
@@ -549,11 +547,11 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     }
 
     @SimpleProperty(
-        description = "Returns the adapter position of the last fully visible view."
+        description = "Returns a comma-separated string of all dynamic component tags currently managed."
     )
     fun allDynTags(): String {
-        val allTags = dynamicComponents.allTags() // Получаем список всех тегов
-        return allTags.joinToString(", ") // Преобразуем список в строку, разделенную запятыми
+        val allTags = dynamicComponents.allTags() // Get a list of all tags
+        return allTags.joinToString(", ") // Convert the list to a comma separated string
     }
 
     @SimpleProperty(
@@ -693,13 +691,13 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     fun ScrollStateSettling() = RecyclerView.SCROLL_STATE_SETTLING
 
     @SimpleProperty
-    fun HandlerDragDropMode() = "handle"
+    fun HandlerDragMode() = "handle"
 
     @SimpleProperty
-    fun LongPressDragDropMode() = "longPress"
+    fun LongPressDragMode() = "longPress"
 
     @SimpleProperty
-    fun NoDragDropMode() = "none"
+    fun NoDragMode() = "none"
 
     @SimpleProperty
     fun DragHandleTag() = "DragHandleTag"
