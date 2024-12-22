@@ -67,7 +67,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         dragMode: String,
         swipe: Boolean,
         scrollBarColor: String,
-        padRight: Int
+        scrollPadRight: Int
     ) {
         recyclerView = RecyclerView(context).apply {
             this.layoutManager = ListManager.valueOf(layoutManager).getLayoutManager(
@@ -158,7 +158,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
                 // We set the margins for the container itself
-                setPadding(0, 0, padRight.px, 0) // Padding in padRight.px pixels on the right
+                setPadding(0, 0, scrollPadRight.px, 0) // Padding in scrollPadRight.px pixels on the right
             }
 
             frameLayout.addView(recyclerView, FrameLayout.LayoutParams(
@@ -424,12 +424,12 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         recyclerView?.smoothScrollToPosition(position.dec())
     }
 
-    @SimpleEvent(description = "riggered when an item in the list is moved.")
+    @SimpleEvent(description = "Triggered when an item in the list is moved.")
     fun OnMoveTriggered(fromPosition: Int, toPosition: Int) {
         EventDispatcher.dispatchEvent(this, "OnMoveTriggered", fromPosition, toPosition)
     }
 
-    @SimpleEvent(description = "TTriggered when the user starts moving an item.")
+    @SimpleEvent(description = "Triggered when the user starts moving an item.")
     fun OnMoveStart(position: Int) {
         EventDispatcher.dispatchEvent(this, "OnMoveStart", position)
     }
