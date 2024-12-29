@@ -360,8 +360,8 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     @SimpleFunction(
         description = "Get methods of the component."
     )
-    fun GetComponentMethods(`in`: AndroidViewComponent): YailList {
-        return dynamicComponents.getAvailableMethodsAsYailList(`in`)
+    fun GetComponentMethods(`component`: AndroidViewComponent): YailList {
+        return dynamicComponents.getAvailableMethodsAsYailList(`component`)
     }
 
     @SimpleFunction(
