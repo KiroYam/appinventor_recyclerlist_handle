@@ -128,6 +128,25 @@ class DynamicComponents {
         return item != null
     }
 
+    fun getAvailableMethods(component: AndroidViewComponent): List<String> {
+        val methodNames = mutableListOf<String>()
+        try {
+            val clazz = component.javaClass
+            val methods = clazz.methods
+            for (method in methods) {
+                methodNames.add(method.name)
+            }
+        } catch (e: Exception) {
+            throw YailRuntimeError("Error retrieving methods: ${e.message}", LOG_TAG)
+        }
+        return methodNames
+    }
+
+    fun getAvailableMethodsAsYailList(component: AndroidViewComponent): YailList {
+        val methods = getAvailableMethods(component)
+        return YailList.makeList(methods)
+    }
+
     fun setProperties(component: AndroidViewComponent, properties: Any) {
         val propertiesString = if (properties is String) properties else properties.toString()
         try {

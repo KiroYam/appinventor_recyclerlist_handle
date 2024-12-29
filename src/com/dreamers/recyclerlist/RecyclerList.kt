@@ -26,6 +26,7 @@ import com.google.appinventor.components.runtime.AndroidViewComponent
 import com.google.appinventor.components.runtime.ComponentContainer
 import com.google.appinventor.components.runtime.EventDispatcher
 import com.google.appinventor.components.runtime.util.YailList
+import com.google.appinventor.components.runtime.errors.YailRuntimeError
 
 @Suppress("FunctionName")
 class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibleComponent(container.`$form`()){
@@ -65,7 +66,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         reverse: Boolean,
         spanCount: Int,
         dragMode: String,
-        swipe: Boolean,
+        //swipe: Boolean,
         scrollBarColor: String,
         scrollPadRight: Int
     ) {
@@ -76,7 +77,7 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
                 reverse,
                 spanCount
             )
-            enableSwipe = swipe
+            //enableSwipe = swipe
             adapter = createAdapter()
 
 
@@ -181,13 +182,25 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
     inner class RecyclerAdapter : RecyclerView.Adapter<ViewHolder>() {
         var itemTouchHelper: ItemTouchHelper? = null
         private var data: YailList = YailList.makeEmptyList()
-
+        var enableSwipe: Boolean = false
+        var enableTrnsp: Boolean = false
         fun updateData(data: YailList) {
             if (this.data != data) {
-                this.data = data
+                this.data = YailList.makeList(data.toMutableList())//data
             }
         }
 
+        fun updateSwipe(enableSwipe: Boolean) {
+            if (this.enableSwipe != enableSwipe) {
+                this.enableSwipe = enableSwipe
+            }
+        }
+
+        fun updateOpacity(enableTrnsp: Boolean) {
+            if (this.enableTrnsp != enableTrnsp) {
+                this.enableTrnsp = enableTrnsp
+            }
+        }
 
         fun moveMyItem(fromPosition: Int, toPosition: Int) {
             if (fromPosition < 0 || toPosition < 0 || fromPosition >= data.size || toPosition >= data.size) {
@@ -210,20 +223,26 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         }
 
         fun removeMyItem(fromPosition: Int) {
-            if (fromPosition < 0 || fromPosition >= data.size ) {
-                return // Check for valid indices
+            try {
+                if (fromPosition < 0 || fromPosition >= data.size) {
+                    return // Check for valid indices
+                }
+
+                // Convert YailList to a mutable list
+                val mutableData = data.toMutableList()
+
+                // Move the element
+                val item = mutableData.removeAt(fromPosition) // Remove the object from the position
+
+                // Convert back to YailList
+                data = YailList.makeList(mutableData)
+                // Notify the adapter about the change of positions
+                notifyItemRemoved(fromPosition)
             }
-
-            // Convert YailList to a mutable list
-            val mutableData = data.toMutableList()
-
-            // Move the element
-            val item = mutableData.removeAt(fromPosition) // Remove the object from the position
-
-            // Convert back to YailList
-            data = YailList.makeList(mutableData)
-            // Notify the adapter about the change of positions
-            notifyItemRemoved(fromPosition)
+            catch (e: Exception)
+            {
+                throw YailRuntimeError("Got an error inside the invoke", "adapter")
+            }
         }
 
 
@@ -264,8 +283,8 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
             val adapter = recyclerView.adapter as RecyclerAdapter
 
             val callback = when (dragModeGlob) {
-                "handle" -> DragAndDropCallback(this, adapter, transparentView, enableSwipe, true)
-                "longPress" -> DragAndDropCallback(this, adapter, transparentView, enableSwipe, false)
+                "handle" -> DragAndDropCallback(this, adapter, transparentView,/* enableSwipe,*/ true)
+                "longPress" -> DragAndDropCallback(this, adapter, transparentView,/* enableSwipe,*/ false)
                 else ->  throw IllegalArgumentException("Invalid drag mode: $dragModeGlob")
             }
 
@@ -336,6 +355,13 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
             val decoration = MarginItemDecoration(orientation, spanCount, gap.px)
             addItemDecoration(decoration)
         }
+    }
+
+    @SimpleFunction(
+        description = "Get methods of the component."
+    )
+    fun GetComponentMethods(`in`: AndroidViewComponent): YailList {
+        return dynamicComponents.getAvailableMethodsAsYailList(`in`)
     }
 
     @SimpleFunction(
@@ -490,7 +516,17 @@ class RecyclerList(private val container: ComponentContainer) : AndroidNonvisibl
         description = "Change transparancy of item while dragging"
     )
     fun TransparentView(value: Boolean) {
-        transparentView = value
+        //transparentView = value
+        (recyclerView?.adapter as? RecyclerAdapter)?.updateOpacity(value)
+    }
+
+
+
+    @SimpleProperty(
+        description = "Update swipe property. Boolean type"
+    )
+    fun SwipeEnable(EnableSwipe: Boolean) {
+        (recyclerView?.adapter as? RecyclerAdapter)?.updateSwipe(EnableSwipe)
     }
 
     @SimpleProperty(

@@ -4,11 +4,12 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.appinventor.components.annotations.SimpleEvent
 import com.google.appinventor.components.runtime.EventDispatcher
+import com.google.appinventor.components.runtime.errors.YailRuntimeError
 
 class DragAndDropCallback(private val recyclerList: RecyclerList,
                           private val adapter: RecyclerList.RecyclerAdapter,
                           private val transparentView: Boolean,
-                          private val enableSwipe: Boolean,
+                          //private val enableSwipeOld: Boolean,
                           private val useHandle: Boolean
                           ) : ItemTouchHelper.Callback() {
 
@@ -21,7 +22,8 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
     ): Int {
         val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
         var swipeFlags = 0
-        if (enableSwipe)
+        //if (enableSwipe)
+        if (adapter.enableSwipe)
             swipeFlags = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT // Can be used for swipes if needed
         return makeMovementFlags(dragFlags, swipeFlags)
     }
@@ -45,7 +47,8 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
 
             if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
                 // Element selected for dragging
-                if (transparentView == true) {
+                //if (transparentView == true) {
+                if (adapter.enableTrnsp){
                     viewHolder?.itemView?.alpha = 0.5f // Change the transparency of an element
                 }
                 currentViewHolder = viewHolder
@@ -58,7 +61,8 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
             }
             else if (actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
                 // The element is no longer draggable or swiped
-                if (transparentView == true) {
+                //if (transparentView == true) {
+                if (adapter.enableTrnsp){
                     currentViewHolder?.itemView?.alpha = 1.0f // Restore the element's original transparency
                 }
                 EventDispatcher.dispatchEvent(recyclerList, "OnMoveEnd", startPosition, currentViewHolder?.adapterPosition)
@@ -69,20 +73,28 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
 
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        val position = viewHolder.adapterPosition
-        when (direction) {
-            ItemTouchHelper.LEFT -> {
-                EventDispatcher.dispatchEvent(
-                    recyclerList, "OnItemSwiped", position, "left"
-                )
+        try {
+            val position = viewHolder.adapterPosition
+            when (direction) {
+                ItemTouchHelper.LEFT -> {
+                    EventDispatcher.dispatchEvent(
+                        recyclerList, "OnItemSwiped", position, "left"
+                    )
+                }
+
+                ItemTouchHelper.RIGHT -> {
+                    EventDispatcher.dispatchEvent(
+                        recyclerList, "OnItemSwiped", position, "right"
+                    )
+                }
             }
-            ItemTouchHelper.RIGHT -> {
-                EventDispatcher.dispatchEvent(
-                    recyclerList, "OnItemSwiped", position, "right"
-                )
-            }
+            adapter.removeMyItem(position)
+        } catch (e: Exception)
+        {
+            throw YailRuntimeError("Got an error inside the invoke", "DragAndDropCallback")
+
         }
-        adapter.removeMyItem(position)
+
     }
 
     override fun isLongPressDragEnabled(): Boolean {
@@ -90,7 +102,7 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
     }
 
     override fun isItemViewSwipeEnabled(): Boolean {
-        return enableSwipe
+        return true
     }
 
 }
