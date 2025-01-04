@@ -75,6 +75,7 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         try {
             val position = viewHolder.adapterPosition
+            adapter.removeMyItem(position)
             when (direction) {
                 ItemTouchHelper.LEFT -> {
                     EventDispatcher.dispatchEvent(
@@ -88,7 +89,7 @@ class DragAndDropCallback(private val recyclerList: RecyclerList,
                     )
                 }
             }
-            adapter.removeMyItem(position)
+
         } catch (e: Exception)
         {
             throw YailRuntimeError("Got an error inside the invoke", "DragAndDropCallback")
